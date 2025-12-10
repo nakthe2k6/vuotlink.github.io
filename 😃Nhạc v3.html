@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Trình Phát Nhạc Vô Hạn</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg,#1e0033,#330066,#5e00cc,#9900ff);
+    background-size: 300% 300%;
+    animation: gradientMove 10s infinite alternate;
+    padding: 20px;
+}
+
+/* Animation */
+@keyframes gradientMove {
+ 0% {background-position: 0% 50%;}
+ 100% {background-position: 100% 50%;}
+}
+
+/* Glass UI container */
+.container {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(15px);
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 0 25px rgba(255,255,255,0.15);
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* Neon Title */
+h2 {
+    text-align: center;
+    color: #fff;
+    font-size: 26px;
+    text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff55ff;
+    margin-bottom: 20px;
+}
+
+/* Input + Button line */
+.lineBox {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Input */
+input[type=text] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.85);
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+/* Button */
+button {
+    width: 100%;
+    padding: 10px;
+    background: #ff00cc;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0 0 10px #ff00ff;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #ff33dd;
+    box-shadow: 0 0 15px #ff55ff;
+}
+
+/* Player */
+.playerBox {
+    margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<div class="lineBox" style="border:2px solid #ff33ff">
+    <label style="color:#fff;font-weight:600;">🔍 Tìm bài hát SoundCloud</label>
+    <input id="search_name" placeholder="Nhập tên bài hát cần tìm...">
+    <button onclick="searchSong()">Tìm bài hát hay nhất</button>
+    <div id="search_result" style="margin-top:10px"></div>
+</div>
+
+<div class="container">
+
+    <h2>🎵 Trình Phát Nhạc Vô Hạn – DS Gaming</h2>
+
+    <!-- Dòng đầu có sẵn -->
+    <div class="lineBox">
+        <label style="color:#fff;font-weight:600;">Link Nhạc</label>
+        <input id="music1" value="https://soundcloud.com/wendythao80052/h-n-h-nh-ng-kh-ng-y-u-remix">
+        <button onclick="playMusic('music1','player1')">Phát Nhạc</button>
+        <div id="player1" class="playerBox"></div>
+    </div>
+
+    <!-- Ô tự thêm vô hạn -->
+    <div id="moreBox"></div>
+
+    <button onclick="addLine()" style="margin-top:20px;background:#00ccff;box-shadow:0 0 10px #55ddff;">
+        + Thêm Dòng Phát Nhạc
+    </button>
+
+</div>
+
+<script>
+function searchSong() {
+    const q = document.getElementById("searchInput").value.trim();
+    if (!q) return;
+
+    const result = document.getElementById("searchResult");
+    result.innerHTML = "⏳ Đang tìm bài hát…";
+
+    // Tìm bài đầu tiên SoundCloud trả về (không lọc gì)
+    fetch(`https://api-v2.soundcloud.com/search/tracks?q=${encodeURIComponent(q)}&limit=1&client_id=2t9loNQH90kzJcsFCODdigxfp325aq4z`)
+        .then(res => res.json())
+        .then(data => {
+            if (!data.collection || data.collection.length === 0) {
+                result.innerHTML = "❌ Không tìm thấy bài nào!";
+                return;
+            }
+
+            const track = data.collection[0];
+
+            result.innerHTML = `
+                <div style="margin-top:10px; padding:10px; background:rgba(255,255,255,0.1); border-radius:10px;">
+                    <b>🎵 Tên bài:</b> ${track.title}<br>
+                    <b>👤 Nghệ sĩ:</b> ${track.user.username}<br>
+                    <b>🔗 Link:</b> 
+                    <a href="${track.permalink_url}" target="_blank" style="color:#00eaff;">
+                        ${track.permalink_url}
+                    </a>
+                </div>
+            `;
+        })
+        .catch(err => {
+            result.innerHTML = "⚠ Lỗi khi tìm bài!";
+        });
+}
+</script>
+
+<script>
+let count = 2;
+
+function playMusic(inputId, playerId) {
+    let link = document.getElementById(inputId).value.trim();
+    if (!link) return;
+
+    let embed = `https://w.soundcloud.com/player/?url=${encodeURIComponent(link)}&auto_play=true`;
+    document.getElementById(playerId).innerHTML = 
+        `<iframe width="100%" height="200" frameborder="no" allow="autoplay"
+         src="${embed}"></iframe>`;
+}
+
+function addLine() {
+    count++;
+    const box = document.getElementById("moreBox");
+
+    box.innerHTML += `
+        <div class="lineBox">
+            <label style="color:#fff;font-weight:600;">Link Nhạc</label>
+            <input id="music${count}" placeholder="Nhập link SoundCloud / YouTube / ZingMP3...">
+            <button onclick="playMusic('music${count}','player${count}')">Phát Nhạc</button>
+            <div id="player${count}" class="playerBox"></div>
+        </div>
+    `;
+}
+</script>
+
+</body>
+</html>
