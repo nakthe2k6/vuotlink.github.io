@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Tools - Trình phát & tải nhạc</title>
+    <style>
+        body {
+            background-color: white;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .tab-btn {
+            background: yellow;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .tab-btn:hover {
+            background: orange;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 5px solid;
+            border-image: linear-gradient(45deg, red, yellow, green, cyan, blue, magenta, red) 1;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            position: relative;
+        }
+        .active { display: block; }
+        .exit-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: black;
+            color: white;
+            font-size: 18px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        #audio-player {
+            width: 100%;
+            margin-top: 10px;
+        }
+        #web-frame {
+            width: 100%;
+            height: 500px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tab-container">
+        <button class="tab-btn" onclick="openTab('play-music')">Mở Nhạc</button>
+        <button class="tab-btn" onclick="openTab('download-music')">Tải Nhạc</button>
+        <button class="tab-btn" onclick="openTab('open-web')">Mở Web</button>
+    </div>
+
+    <!-- Trình phát nhạc -->
+    <div id="play-music" class="tab-content">
+        <button class="exit-btn" onclick="closeTab()">X</button>
+        <h2>Trình Phát Nhạc</h2>
+        <input type="file" id="file-input" accept="audio/*"><br><br>
+        <label for="audio-url">Hoặc nhập URL nhạc:</label>
+        <input type="text" id="audio-url" placeholder="Nhập link nhạc...">
+        <button onclick="playURL()">Phát Nhạc</button>
+        <audio id="audio-player" controls class="hidden"></audio>
+    </div>
+
+    <!-- Tải nhạc -->
+    <div id="download-music" class="tab-content">
+        <button class="exit-btn" onclick="closeTab()">X</button>
+        <h2>Trình Tải Nhạc</h2>
+        <input type="text" id="music-url" placeholder="Nhập URL nhạc...">
+        <button onclick="downloadMusic()">Lấy Link</button>
+        <p id="download-link"></p>
+    </div>
+
+    <!-- Trình duyệt mini -->
+    <div id="open-web" class="tab-content active">
+        <button class="exit-btn" onclick="closeTab()">X</button>
+        <h2>Mở Web</h2>
+        <input type="text" id="web-url" placeholder="Nhập URL hoặc từ khóa tìm kiếm...">
+        <button onclick="openWeb()">Truy Cập</button>
+        <iframe id="web-frame" src="https://www.google.com"></iframe>
+    </div>
+
+    <script>
+        function openTab(tabId) {
+            document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+        }
+        function closeTab() {
+            document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+        }
+
+        function playURL() {
+            let url = document.getElementById('audio-url').value;
+            let audio = document.getElementById('audio-player');
+            let webFrame = document.getElementById('web-frame');
+
+            if (!url) {
+                alert("Vui lòng nhập link nhạc!");
+                return;
+            }
+
+            if (url.includes("youtube.com") || url.includes("soundcloud.com") || url.includes("zingmp3.vn")) {
+                openTab("open-web"); // Chuyển sang tab "Mở Web"
+                openWebWithURL(url); // Mở trong trình duyệt mini
+            } else {
+                audio.src = url;
+                audio.classList.remove("hidden");
+                audio.play();
+            }
+        }
+
+        function openWeb() {
+            let input = document.getElementById('web-url').value;
+            openWebWithURL(input);
+        }
+
+        function openWebWithURL(input) {
+            let url;
+            if (input.includes(".") && !input.includes(" ")) {
+                // Nếu nhập URL thì thêm https:// nếu thiếu
+                url = input.startsWith("http") ? input : "https://" + input;
+            } else {
+                // Nếu nhập từ khóa thì tìm kiếm trên Google
+                url = `https://www.google.com/search?q=${encodeURIComponent(input)}`;
+            }
+            document.getElementById("web-frame").src = url;
+        }
+
+        function downloadMusic() {
+            let url = document.getElementById('music-url').value;
+            if (!url) {
+                alert("Vui lòng nhập link!");
+                return;
+            }
+            document.getElementById("download-link").innerHTML = `Link tải: <a href="${url}" target="_blank">${url}</a>`;
+        }
+    </script>
+
+</body>
+</html>

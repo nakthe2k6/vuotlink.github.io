@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AdFree Web Viewer (HTML đơn)</title>
+<style>
+  :root { --bg:#0f1115; --fg:#e6e6e6; --muted:#9aa0a6; --acc:#4fc3f7; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+  header { display:flex; gap:.5rem; padding:.6rem; border-bottom:1px solid #222; background:#12151b; position:sticky; top:0; z-index:10; }
+  input[type="text"]{ flex:1; padding:.6rem .8rem; border:1px solid #2a2e36; background:#0e1014; color:var(--fg); border-radius:8px; outline:none; }
+  input[type="text"]::placeholder { color:var(--muted); }
+  button { padding:.55rem .8rem; border:1px solid #2a2e36; background:#171a21; color:var(--fg); border-radius:8px; cursor:pointer; }
+  button:hover{ border-color:#3a3f48; }
+  .small{ font-size:12px; color:var(--muted); padding:.3rem .8rem; }
+  iframe { width:100%; height:calc(100vh - 70px); border:0; background:#fff; }
+  .row { display:flex; gap:.5rem; width:100%; }
+  .pill { padding:.2rem .5rem; border:1px solid #2a2e36; border-radius:999px; display:inline-block; }
+  .status { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="row" style="align-items:center">
+      <button id="btnBack" title="Quay lại">←</button>
+      <button id="btnFwd" title="Tiến">→</button>
+      <input id="urlInput" type="text" placeholder="Dán link bất kỳ, ví dụ: https://vnexpress.net/" spellcheck="false">
+      <button id="btnGo">Đi</button>
+      <button id="btnReload">Tải lại</button>
+      <button id="btnReader" title="Chế độ Reader (siêu sạch)">Reader</button>
+    </div>
+  </header>
+
+  <div class="small">
+    <span class="pill">Chặn script</span>
+    <span class="pill">Chặn iframe</span>
+    <span class="pill">Lọc phần tử quảng cáo phổ biến</span>
+    <span id="status" class="status"></span>
+  </div>
+
+  <iframe id="view" sandbox="allow-forms allow-popups-to-escape-sandbox"></iframe>
+
+<script>
+(function(){
+  const $ = sel => document.querySelector(sel);
+  const urlInput = $('#urlInput');
+  const view = $('#view');
+  const status = $('#status');
+  const btnGo = $('#btnGo'), btnReload = $('#btnReload');
+  const btnReader = $('#btnReader'), btnBack = $('#btnBack'), btnFwd = $('#btnFwd');
+
+  // Lưu lịch sử điều hướng thủ công
+  const hist = []; let idx = -1;
+
+  // Proxy không CORS (raw HTML)
+  const RAW_PROXY = u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`;
+  // Reader mode (trích xuất nội dung, gần như sạch quảng cáo)
+  const READER = u => `https://r.jina.ai/http://${u.replace(/^https?:\/\//,'')}`;
+
+  // Danh sách domain/quy tắc quảng cáo cơ bản (rút gọn)
+  const BLOCK_DOMAINS = [
+    'doubleclick.net','googlesyndication.com','google-analytics.com','googletagmanager.com',
+    'adservice.google.com','facebook.net','ads-twitter.com','taboola.com','outbrain.com',
+    'scorecardresearch.com','criteo.com','rubiconproject.com','adnxs.com','moatads.com',
+    'quantserve.com','yieldmo.com','pubmatic.com','spotxchange.com','zemanta.com','bttrack.com'
+  ];
+
+  // CSS selector hay gặp của khung quảng cáo
+  const AD_SELECTORS = [
+    '[id*="ad"]','[class*="ad"]','[id*="ads"]','[class*="ads"]',
+    '[id*="banner"]','[class*="banner"]','[class*="sponsor"]','[id*="sponsor"]',
+    'iframe','ins','.advertisement','.ad-slot','.adcontainer','.ad-box','.ad__container'
+  ];
+
+  // Xử lý URL
+  function normalizeUrl(u){
+    try {
+      if(!/^https?:\/\//i.test(u)) u = 'https://' + u;
+      return new URL(u).toString();
+    } catch(e){ return ''; }
+  }
+
+  // Sanitize HTML: xoá script/iframe, phần tử quảng cáo, gắn CSP chặn script toàn cục
+  function sanitizeHtml(rawHtml, baseUrl){
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rawHtml, 'text/html');
+
+    // Base để sửa liên kết tương đối
+    let base = doc.querySelector('base');
+    if(!base){
+      base = doc.createElement('base');
+      base.setAttribute('href', baseUrl);
+      (doc.head||doc.documentElement).prepend(base);
+    } else {
+      base.setAttribute('href', baseUrl);
+    }
+
+    // CSP: chặn script/worker/frame, vẫn cho ảnh/CSS & https
+    const csp = doc.createElement('meta');
+    csp.setAttribute('http-equiv','Content-Security-Policy');
+    csp.setAttribute('content', "default-src https: data: blob:; img-src https: data: blob:; style-src https: 'unsafe-inline'; font-src https: data:; script-src 'none'; worker-src 'none'; frame-src 'none'; connect-src https:");
+    (doc.head||doc.documentElement).prepend(csp);
+
+    // Xoá toàn bộ <script>, <noscript>, <iframe>, <embed>
+    doc.querySelectorAll('script,noscript,iframe,embed').forEach(n=>n.remove());
+
+    // Xoá thẻ/link tải trước dễ dính theo dõi
+    doc.querySelectorAll('link[rel="preload"], link[rel="prefetch"], link[rel="prerender"]').forEach(n=>n.remove());
+
+    // Xoá sự kiện inline (onclick, onload, …)
+    doc.querySelectorAll('*').forEach(el=>{
+      [...el.attributes].forEach(a=>{
+        if(/^on/i.test(a.name)) el.removeAttribute(a.name);
+      });
+    });
+
+    // Xoá phần tử có class/id gợi ý quảng cáo
+    try {
+      doc.querySelectorAll(AD_SELECTORS.join(',')).forEach(n=>{
+        // Đừng xoá <link rel="stylesheet">
+        if(n.tagName.toLowerCase()==='link' && n.rel==='stylesheet') return;
+        n.remove();
+      });
+    } catch(e) {}
+
+    // Chặn tài nguyên từ domain quảng cáo: xoá <link href>, <img src>, <video src/poster>, <source src>
+    const block = (url) => {
+      try { const h = new URL(url, baseUrl).hostname; return BLOCK_DOMAINS.some(d => h.endsWith(d)); }
+      catch(e){ return false; }
+    };
+    doc.querySelectorAll('link[href], img[src], video[src], video[poster], source[src]').forEach(el=>{
+      const attr = el.hasAttribute('href') ? 'href' : (el.hasAttribute('src') ? 'src' : (el.hasAttribute('poster')?'poster':null));
+      if(!attr) return;
+      const v = el.getAttribute(attr);
+      if(!v) return;
+      if(block(v)) el.remove();
+    });
+
+    // Gợi ý tối: đặt nền trắng cho nội dung nếu trang thiếu CSS do bị chặn script
+    if(!doc.body) return rawHtml;
+    doc.body.style.background = 'white';
+    doc.body.style.color = '#111';
+
+    return '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
+  }
+
+  async function load(url, mode='proxy'){
+    const u = normalizeUrl(url);
+    if(!u){ status.textContent = 'URL không hợp lệ.'; return; }
+    urlInput.value = u;
+    status.textContent = (mode==='reader'?'Reader: ':'Đang tải: ') + u;
+
+    try {
+      if(mode==='reader'){
+        // Reader mode: text-only, siêu sạch (không giữ layout)
+        const readerUrl = READER(u);
+        view.removeAttribute('src');
+        view.setAttribute('src', readerUrl);
+      } else {
+        // Proxy mode: lấy HTML gốc, làm sạch, nhét vào iframe srcdoc
+        const res = await fetch(RAW_PROXY(u), { cache:'no-store' });
+        const html = await res.text();
+        const clean = sanitizeHtml(html, u);
+        view.setAttribute('srcdoc', clean);
+      }
+
+      // cập nhật lịch sử
+      if(hist[idx] !== u){
+        hist.splice(idx+1);
+        hist.push({u, mode});
+        idx = hist.length - 1;
+      }
+      updateNav();
+      status.textContent = 'Xong: ' + u;
+    } catch(err){
+      console.error(err);
+      status.textContent = 'Lỗi tải trang (có thể bị chặn CORS/cấu hình).';
+    }
+  }
+
+  function updateNav(){
+    btnBack.disabled = idx<=0;
+    btnFwd.disabled = idx>=hist.length-1;
+  }
+
+  // Events
+  btnGo.onclick = ()=> load(urlInput.value.trim(), 'proxy');
+  btnReader.onclick = ()=> load(urlInput.value.trim(), 'reader');
+  btnReload.onclick = ()=> { if(idx>=0) load(hist[idx].u, hist[idx].mode); };
+  btnBack.onclick = ()=> { if(idx>0){ idx--; const {u,mode}=hist[idx]; urlInput.value=u; load(u,mode); } };
+  btnFwd.onclick = ()=> { if(idx<hist.length-1){ idx++; const {u,mode}=hist[idx]; urlInput.value=u; load(u,mode); } };
+
+  // Enter để đi
+  urlInput.addEventListener('keydown', e=>{ if(e.key==='Enter') btnGo.click(); });
+
+  // Tự điền ví dụ
+  urlInput.value = 'https://vnexpress.net/';
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<style>
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    height:100vh;
+    font-family: Futura, system-ui;
+    background:#f3f1f5;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction: column;
+  }
+
+  .menu-header{
+    font-size: 22px;
+    font-weight: bold;
+    text-align:center;
+    margin-bottom: 14px;
+    color:#333;
+    text-shadow:0 1px 3px rgba(0,0,0,0.15);
+  }
+
+  .card{
+    width:min(600px, 88vw);
+    background:white;
+    border-radius:18px;
+    padding:10px 10px;
+    box-shadow:0 5px 16px rgba(0,0,0,0.05);
+  }
+
+  .list{list-style:none;margin:0;padding:0;}
+
+  .item{
+    display:flex;
+    align-items:center;
+    height:58px;
+    gap:12px;
+    padding:0 14px;
+    position:relative;
+    border-radius:12px;
+    transition:background .15s;
+  }
+
+  .item:hover{
+    background:rgba(0,0,0,0.03);
+  }
+
+  .icon{
+    width:35px;
+    height:35px;
+    border-radius:12px;
+    background:#C0C0C0;
+  }
+
+  .title{
+    font-size:14px;
+    color:#222;
+  }
+  .subtitle{
+    font-size:11px;
+    color:#9b9b9b;
+    margin-top:4px;
+  }
+
+  /* TOGGLE iOS MINI */
+  .toggle{
+    --w:38px;
+    --h:22px;
+
+    width:var(--w);
+    height:var(--h);
+    border-radius:22px;
+    background:#d5d5d5;
+    position:relative;
+    cursor:pointer;
+    transition:background .26s ease;
+    flex: 0 0 auto;
+  }
+
+  .toggle::after{
+    content:"";
+    position:absolute;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:white;
+    top:2px;
+    left:2px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.20);
+    transition:
+      transform .26s cubic-bezier(.22,.61,.36,1),
+      background .26s cubic-bezier(.22,.61,.36,1);
+  }
+
+  .toggle.on{
+    background:#34c759;
+  }
+
+  .toggle.on::after{
+    transform:translateX(16px);
+  }
+</style>
+</head>
+
+<body>
+
+  <div class="menu-header">Make By Phuong Duy</div>
+
+  <div class="card">
+    <ul class="list">
+
+      <li class="item">
+        <div class="icon"></div>
+        <div style="flex:1">
+          <div class="title">Speed 1.1</div>
+          <div class="subtitle">Chạy nhanh</div>
+        </div>
+
+        <div class="toggle" id="toggle-speed" role="switch" aria-checked="false"></div>
+      </li>
+
+    </ul>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var tSpeed = document.getElementById('toggle-speed');
+
+  function applyState(el, willBeOn) {
+    if (willBeOn) {
+      el.classList.add('on');
+      el.setAttribute('aria-checked', 'true');
+    } else {
+      el.classList.remove('on');
+      el.setAttribute('aria-checked', 'false');
+    }
+  }
+
+  var h5ggReady = (typeof h5gg !== 'undefined');
+
+  function safeRequire() {
+    if (h5ggReady && typeof h5gg.require === 'function') {
+      try { h5gg.require(5.9); } catch(e){}
+    }
+  }
+
+  function setSpeed() {
+    if (h5ggReady && typeof h5gg.editAll === 'function') {
+      try { h5gg.editAll('-10000', 'I32'); } catch(e){}
+    }
+  }
+
+  function disableSpeed() {
+    if (h5ggReady && typeof h5gg.editAll === 'function') {
+      try { h5gg.editAll('10000', 'I32'); } catch(e){}
+    }
+  }
+
+  function searchSpeed() {
+    if (h5ggReady && typeof h5gg.searchNumber === 'function') {
+      try {
+        h5gg.clearResults();
+        h5gg.searchNumber('10000', 'I32', '0x99999999', '0x139000000');
+      } catch(e){}
+    }
+  }
+
+  function getResultsCountSafe() {
+    if (h5ggReady && typeof h5gg.getResultsCount === 'function') {
+      try { return h5gg.getResultsCount(); }
+      catch(e){ return 0; }
+    }
+    return 0;
+  }
+
+  tSpeed.addEventListener('click', function () {
+    var willBeOn = !tSpeed.classList.contains('on');
+
+    if (willBeOn) {
+      safeRequire();
+      if (getResultsCountSafe() !== 1) searchSpeed();
+      setSpeed();
+    } else {
+      disableSpeed();
+    }
+
+    applyState(tSpeed, willBeOn);
+  });
+
+});
+</script>
+
+</body>
+</html>

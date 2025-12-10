@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AdFree Web Viewer (Chặn Click Ads)</title>
+<style>
+  :root { --bg:#0f1115; --fg:#e6e6e6; --muted:#9aa0a6; --acc:#4fc3f7; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+  header { display:flex; gap:.5rem; padding:.6rem; border-bottom:1px solid #222; background:#12151b; position:sticky; top:0; z-index:10; }
+  input[type="text"]{ flex:1; padding:.6rem .8rem; border:1px solid #2a2e36; background:#0e1014; color:var(--fg); border-radius:8px; outline:none; }
+  input[type="text"]::placeholder { color:var(--muted); }
+  button { padding:.55rem .8rem; border:1px solid #2a2e36; background:#171a21; color:var(--fg); border-radius:8px; cursor:pointer; }
+  button:hover{ border-color:#3a3f48; }
+  .small{ font-size:12px; color:var(--muted); padding:.3rem .8rem; }
+  iframe { width:100%; height:calc(100vh - 70px); border:0; background:#fff; }
+  .row { display:flex; gap:.5rem; width:100%; }
+  .pill { padding:.2rem .5rem; border:1px solid #2a2e36; border-radius:999px; display:inline-block; }
+  .status { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="row" style="align-items:center">
+      <button id="btnBack" title="Quay lại">←</button>
+      <button id="btnFwd" title="Tiến">→</button>
+      <input id="urlInput" type="text" placeholder="Nhập URL, ví dụ https://phimmoichill..." spellcheck="false">
+      <button id="btnGo">Đi</button>
+      <button id="btnReload">Tải lại</button>
+    </div>
+  </header>
+
+  <div class="small">
+    <span class="pill">Chặn popup</span>
+    <span class="pill">Vô hiệu click ads</span>
+    <span class="pill">Giữ player chạy</span>
+    <span id="status" class="status"></span>
+  </div>
+
+  <iframe id="view" sandbox="allow-same-origin allow-scripts allow-forms **allow-media allow-presentation**" ></iframe>
+
+<script>
+(function(){
+  const $ = sel => document.querySelector(sel);
+  const urlInput = $('#urlInput');
+  const view = $('#view');
+  const status = $('#status');
+  const btnGo = $('#btnGo'), btnReload = $('#btnReload');
+  const btnBack = $('#btnBack'), btnFwd = $('#btnFwd');
+
+  const hist = []; let idx = -1;
+  const RAW_PROXY = u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`;
+
+  function normalizeUrl(u){
+    try {
+      if(!/^https?:\/\//i.test(u)) u = 'https://' + u;
+      return new URL(u).toString();
+    } catch(e){ return ''; }
+  }
+
+  function sanitizeHtml(rawHtml, baseUrl){
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rawHtml, 'text/html');
+
+    // base
+    let base = doc.querySelector('base');
+    if(!base){
+      base = doc.createElement('base');
+      base.setAttribute('href', baseUrl);
+      (doc.head||doc.documentElement).prepend(base);
+    } else base.setAttribute('href', baseUrl);
+
+    // style ẩn overlay ads
+    const style = doc.createElement('style');
+    style.textContent = `
+      [onclick*="window.open"],
+      .adsbox, .advertisement, .ad-container, .banner, [id*="ad"], [class*="ad"] {
+        display:none !important;
+      }
+    `;
+    doc.head.appendChild(style);
+
+    // script chống click-bẫy
+    const blocker = doc.createElement('script');
+    blocker.textContent = `
+      // Chặn popup
+      window.open = function(){ return null; };
+      window.alert = window.confirm = window.prompt = ()=>{};
+      // Xoá handler click toàn cục
+      document.addEventListener('DOMContentLoaded', ()=>{
+        document.body.removeAttribute('onclick');
+        document.body.removeAttribute('onmousedown');
+      });
+    `;
+    doc.head.appendChild(blocker);
+
+    return '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
+  }
+
+  async function load(url){
+    const u = normalizeUrl(url);
+    if(!u){ status.textContent = 'URL không hợp lệ.'; return; }
+    urlInput.value = u;
+    status.textContent = 'Đang tải: ' + u;
+    try {
+      const res = await fetch(RAW_PROXY(u), { cache:'no-store' });
+      const html = await res.text();
+      const clean = sanitizeHtml(html, u);
+      view.setAttribute('srcdoc', clean);
+
+      if(hist[idx]?.u !== u){
+        hist.splice(idx+1);
+        hist.push({u});
+        idx = hist.length - 1;
+      }
+      updateNav();
+      status.textContent = 'Xong: ' + u;
+    } catch(err){
+      console.error(err);
+      status.textContent = 'Lỗi tải trang.';
+    }
+  }
+
+  function updateNav(){
+    btnBack.disabled = idx<=0;
+    btnFwd.disabled = idx>=hist.length-1;
+  }
+
+  btnGo.onclick = ()=> load(urlInput.value.trim());
+  btnReload.onclick = ()=> { if(idx>=0) load(hist[idx].u); };
+  btnBack.onclick = ()=> { if(idx>0){ idx--; load(hist[idx].u); } };
+  btnFwd.onclick = ()=> { if(idx<hist.length-1){ idx++; load(hist[idx].u); } };
+  urlInput.addEventListener('keydown', e=>{ if(e.key==='Enter') btnGo.click(); });
+
+  urlInput.value = 'https://phimmoichill';
+})();
+</script>
+</body>
+</html>

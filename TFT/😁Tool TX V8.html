@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Tool Tài Xỉu MD5 - Hệ Thống VIP - Độ Kiếp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --expert-color: #ffc107;
+            --master-color: #dc3545;
+            --dokiep-color: #9c27b0; 
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-radius: 8px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .tab-content[data-tab="dokiep"] {
+            background: #0f0f0f;
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin: -20px 0;
+        }
+        .tab-content[data-tab="dokiep"] input {
+            background: #1b1b1b;
+            color: #fff;
+            border: 1px solid #333;
+        }
+        .tab-content[data-tab="dokiep"] button.predict-btn {
+            background: #00eaff;
+            font-weight: bold;
+            color: black;
+        }
+        .tab-content[data-tab="dokiep"] button.predict-btn:hover {
+             background: #00c9e6;
+        }
+
+        .dokiep-header {
+            background: #111;
+            padding: 15px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #00eaff;
+            margin: -20px -20px 20px -20px;
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+        }
+
+        @keyframes spinDice {
+            0% { transform: rotate(0deg); opacity:0.3; }
+            50% { transform: rotate(180deg); opacity:1; }
+            100% { transform: rotate(360deg); opacity:0.3; }
+        }
+        #rng-dice span {
+            display:inline-block;
+            animation: spinDice 0.2s linear infinite;
+            font-size: 55px;
+            margin: 0 10px;
+        }
+
+        #result-dokiep-v2 {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 6px;
+            text-align: left;
+            color: white;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            width: 100%;
+            max-width: 650px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        h2 {
+            font-weight: 900;
+            color: var(--dokiep-color);
+            margin-bottom: 25px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            flex-shrink: 0;
+            padding: 12px 10px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            color: #777;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-button.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
+        .tab-button[data-tab="expert"].active { color: var(--expert-color); border-bottom: 3px solid var(--expert-color); }
+        .tab-button[data-tab="master"].active { color: var(--master-color); border-bottom: 3px solid var(--master-color); }
+        .tab-button[data-tab="dokiep"].active { color: var(--dokiep-color); border-bottom: 3px solid var(--dokiep-color); }
+
+        .tab-content { padding: 20px 0; text-align: left; }
+
+        input[type="text"], input[type="number"], input[type="file"], .dokiep-grid input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            margin: 10px 0 15px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        
+        .dokiep-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .dokiep-grid input { margin: 0; }
+
+        button.predict-btn {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .tab-content[data-tab="dokiep"] button.predict-btn { background-color: #00eaff; color: black; } 
+        .tab-content[data-tab="dokiep"] button.predict-btn:hover { background-color: #00c9e6; } 
+        .tab-content[data-tab="expert"] button.predict-btn { background-color: var(--expert-color); }
+        .tab-content[data-tab="expert"] button.predict-btn:hover { background-color: #d69900; }
+        .tab-content[data-tab="master"] button.predict-btn { background-color: var(--master-color); }
+        .tab-content[data-tab="master"] button.predict-btn:hover { background-color: #c82333; }
+
+        .hidden { display: none !important; }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 17px;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .result h5 { margin-top: 0; font-size: 1.1em; }
+        .result .prediction-value { font-size: 2.2em; font-weight: 900; }
+        .result .detail-line { font-weight: 400; font-size: 0.9em; margin-top: 5px; }
+
+        #result-simple { background: #e7f5ff; border: 1px solid #cce5ff; color: var(--primary-color); }
+        #result-expert { background: #fff3cd; border: 1px solid #ffeeba; color: var(--expert-color); }
+        #result-master { background: #f8d7da; border: 1px solid #f5c6cb; color: var(--master-color); }
+
+        .confidence-bar {
+            width: 80%;
+            height: 20px;
+            margin: 10px auto;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .confidence-level {
+            height: 100%;
+            background-color: var(--dokiep-color);
+            transition: width 1s ease-out;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .footer { margin-top: 20px; color: #999; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="license-container">
+    <h2>🔐 KÍCH HOẠT BẢN QUYỀN</h2>
+    <input type="text" id="license-key" placeholder="Nhập KEY kích hoạt...">
+    <button class="predict-btn" onclick="verifyKey()">Mở khóa Tool</button>
+    <div id="license-msg" class="result hidden"></div>
+</div>
+
+<div class="container hidden" id="main-tool">
+    <h2>👑 HỆ THỐNG PHÂN TÍCH ĐỘ KIẾP V.AI</h2>
+
+    <div class="tabs">
+        <button class="tab-button" data-tab="simple" onclick="showTab('simple')">Đơn Giản</button>
+        <button class="tab-button" data-tab="expert" onclick="showTab('expert')">Chuyên Gia</button>
+        <button class="tab-button" data-tab="master" onclick="showTab('master')">Bậc Thầy</button>
+        <button class="tab-button active" data-tab="dokiep" onclick="showTab('dokiep')">ĐỘ KIẾP</button>
+    </div>
+
+    <div class="tab-content hidden" id="tab-simple" data-tab="simple">
+        <p>Phân tích tỷ lệ cơ bản dựa trên MD5 Hash.</p>
+        <input type="text" id="simple-input" placeholder="Nhập Mã Phiên hoặc Mã MD5...">
+        <button class="predict-btn" onclick="predictSimple()">Dự Đoán Đơn Giản</button>
+        <div id="result-simple" class="result hidden"></div>
+    </div>
+
+    <div class="tab-content hidden" id="tab-expert" data-tab="expert">
+        <p style="color: var(--expert-color);">Phân tích nâng cao: Phát hiện điểm rơi và biến động Hash.</p>
+        <input type="text" id="expert-input-maphien" placeholder="Nhập Mã Phiên...">
+        <input type="text" id="expert-input-sophan" placeholder="Nhập số phiên đã chơi (Ví dụ: 5-10)">
+        <button class="predict-btn" onclick="predictExpert()">Phân Tích Chuyên Gia</button>
+        <div id="result-expert" class="result hidden"></div>
+    </div>
+
+    <div class="tab-content hidden" id="tab-master" data-tab="master">
+        <p style="color: var(--master-color);">Phân tích tối thượng: Dự đoán chính xác kết quả Tài/Xỉu.</p>
+        <input type="text" id="master-input-maphien" placeholder="Nhập Mã Phiên...">
+        <input type="text" id="master-input-cuoc" placeholder="Nhập số tiền cược dự kiến (Ví dụ: 100k - 500k)">
+        <button class="predict-btn" onclick="predictMaster()">Dự Đoán Bậc Thầy</button>
+        <div id="result-master" class="result hidden"></div>
+    </div>
+
+    <div class="tab-content" id="tab-dokiep" data-tab="dokiep">
+        <div class="dokiep-header">🔮 TOOL TÀI XỈU – GEMINI AI + RNG</div>
+
+        <div class="dokiep-container" style="padding: 0 20px;"> 
+            <h3 style="margin-top:0;">🔑 Nhập KEY Gemini AI</h3>
+            <input type="text" id="dk-gemini-key" placeholder="Nhập Gemini API Key...">
+
+            <h3>📌 Thông Tin Phiên</h3>
+            <input type="text" id="dk-maphien-v2" placeholder="Mã phiên (bắt buộc)">
+            <input type="text" id="dk-md5-v2" placeholder="Mã MD5">
+            <input type="text" id="dk-history-v2" placeholder="Lịch sử TTTX (không bắt buộc)">
+            <input type="number" id="dk-bet-v2" placeholder="Số tiền cược">
+
+            <h3>🎲 Nhập 3 Xúc Xắc Phiên Trước</h3>
+            <input type="number" id="dk-d1" placeholder="Xúc xắc 1 (1-6)">
+            <input type="number" id="dk-d2" placeholder="Xúc xắc 2 (1-6)">
+            <input type="number" id="dk-d3" placeholder="Xúc xắc 3 (1-6)">
+
+            <h3>🖼 Ảnh phiên (tùy chọn)</h3>
+            <input type="file" id="dk-image-v2" accept="image/*">
+
+            <button class="predict-btn" onclick="predictDokiepV2()">PHÂN TÍCH NGAY</button>
+
+            <div id="rng-box" class="hidden" style="text-align:center; margin-top:25px;">
+                <div style="font-weight:700; margin-bottom:10px; font-size:18px;">🎲 RNG – Mô phỏng xúc xắc:</div>
+                <div id="rng-dice"></div>
+            </div>
+
+            <div id="result-dokiep-v2" class="result hidden"></div> 
+        </div>
+    </div>
+
+    <div class="footer">
+        ⚡ Hệ thống MD5 V.AI | Cấp độ Độ Kiếp
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
+<script>
+const validKeys = ["1", "DUCHUY123", "VIP2025", "KEYTAIXIU", "PRO999", "DOKIEP999"];
+
+function showTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.tab-button[data-tab="${tabName}"]`).classList.add('active');
+}
+
+function verifyKey() {
+    const inputKey = document.getElementById("license-key").value.trim();
+    const msg = document.getElementById("license-msg");
+    msg.classList.remove("hidden");
+
+    if (validKeys.includes(inputKey)) {
+        msg.innerHTML = "✅ Kích hoạt thành công! Chuẩn bị Độ Kiếp...";
+        msg.style.backgroundColor = "#d4edda";
+        msg.style.color = "#155724";
+        setTimeout(() => {
+            document.getElementById("license-container").classList.add("hidden");
+            document.getElementById("main-tool").classList.remove("hidden");
+            showTab('dokiep'); 
+        }, 800);
+    } else {
+        msg.innerHTML = "❌ KEY không hợp lệ! Vui lòng kiểm tra lại.";
+        msg.style.backgroundColor = "#f8d7da";
+        msg.style.color = "#721c24";
+    }
+}
+
+function calculatePredictionValue(input) {
+    if (typeof md5 !== 'function') return { value: 50, hash: 'MD5_ERROR' };
+    let hash = input;
+    if (!/^[0-9a-f]{32}$/.test(input.toLowerCase())) hash = md5(input);
+    const value = parseInt(hash.substring(0, 8), 16) % 100;
+    return { value, hash };
+}
+
+function predictSimple() {
+    const input = document.getElementById("simple-input").value.trim();
+    const result = document.getElementById("result-simple");
+    result.classList.remove("hidden");
+
+    if (!input) {
+        result.innerHTML = "❌ Vui lòng nhập Mã Phiên hoặc Mã MD5!";
+        result.style.backgroundColor = "#f8d7da";
+        result.style.color = "#721c24";
+        return;
+    }
+
+    const { value, hash } = calculatePredictionValue(input);
+    const tai = value;
+    const xiu = 100 - value;
+    const prediction = (tai > xiu) ? 'TÀI' : 'XỈU';
+    const highPercentage = Math.max(tai, xiu);
+
+    result.innerHTML = `
+        <h5>🎯 DỰ ĐOÁN ĐƠN GIẢN</h5>
+        <p class="prediction-value" style="color: ${prediction === 'TÀI' ? '#007bff' : '#0056b3'};">
+            ${prediction} (${highPercentage}%)
+        </p>
+        <div class="detail-line">🔵 TÀI: ${tai}% | 🟢 XỈU: ${xiu}%</div>
+        <div class="detail-line" style="margin-top: 10px;">Hash: ${hash.substring(0, 15)}...</div>
+    `;
+    result.style.backgroundColor = "#e7f5ff";
+    result.style.color = 'var(--primary-color)';
+}
+
+function predictExpert() {
+    const maPhien = document.getElementById("expert-input-maphien").value.trim();
+    const soPhien = document.getElementById("expert-input-sophan").value.trim();
+    const result = document.getElementById("result-expert");
+    result.classList.remove("hidden");
+
+    if (!maPhien || !soPhien) {
+        result.innerHTML = "❌ Vui lòng nhập đầy đủ Mã Phiên và Số phiên đã chơi!";
+        result.style.backgroundColor = "#f8d7da";
+        result.style.color = "#721c24";
+        return;
+    }
+    
+    const { value } = calculatePredictionValue(maPhien);
+    const tai = value;
+    const xiu = 100 - tai;
+
+    const pseudoComplexity = (soPhien.length % 5) + 1; 
+    let finalTai = Math.min(99, Math.max(1, tai + pseudoComplexity));
+    let finalXiu = 100 - finalTai;
+
+    const prediction = (finalTai > finalXiu) ? 'TÀI' : 'XỈU';
+    result.innerHTML = `
+        <h5>🎯 DỰ ĐOÁN CHUYÊN GIA</h5>
+        <p class="prediction-value" style="color: ${prediction === 'TÀI' ? 'var(--expert-color)' : '#856404'};">${prediction} (${Math.max(finalTai, finalXiu)}%)</p>
+        <div class="detail-line">🔵 TÀI: ${finalTai}% | 🟢 XỈU: ${finalXiu}%</div>
+    `;
+    result.style.backgroundColor = "#fff3cd";
+    result.style.color = 'var(--expert-color)';
+}
+
+function predictMaster() {
+    const maPhien = document.getElementById("master-input-maphien").value.trim();
+    const cuoc = document.getElementById("master-input-cuoc").value.trim();
+    const result = document.getElementById("result-master");
+    result.classList.remove("hidden");
+
+    if (!maPhien || !cuoc) {
+        result.innerHTML = "❌ Vui lòng nhập Mã Phiên và số tiền cược!";
+        result.style.backgroundColor = "#f8d7da";
+        result.style.color = "#721c24";
+        return;
+    }
+
+    const { value } = calculatePredictionValue(maPhien);
+    let tai = value, xiu = 100 - value;
+
+    const stakeBonus = parseInt(cuoc.replace(/\D/g, "")) || 0;
+    tai = Math.min(99, Math.max(1, tai + Math.floor(stakeBonus/100000)));
+    xiu = 100 - tai;
+    const prediction = (tai > xiu) ? 'TÀI' : 'XỈU';
+
+    result.innerHTML = `
+        <h5>🎯 DỰ ĐOÁN BẬC THẦY</h5>
+        <p class="prediction-value" style="color: ${prediction === 'TÀI' ? 'var(--master-color)' : '#721c24'};">${prediction} (${Math.max(tai, xiu)}%)</p>
+        <div class="detail-line">🔵 TÀI: ${tai}% | 🟢 XỈU: ${xiu}%</div>
+    `;
+    result.style.backgroundColor = "#f8d7da";
+    result.style.color = 'var(--master-color)';
+}
+
+/* ---------------------- ĐỘ KIẾP AI + RNG ---------------------- */
+async function predictDokiepV2() {
+
+    const maPhien = document.getElementById("dk-maphien-v2").value.trim();
+    const md5Input = document.getElementById("dk-md5-v2").value.trim();
+    const history = document.getElementById("dk-history-v2").value.trim().toUpperCase();
+    const betAmount = document.getElementById("dk-bet-v2").value.trim();
+    const geminiKey = document.getElementById("dk-gemini-key").value.trim();
+    const imageFile = document.getElementById("dk-image-v2").files[0];
+
+    const d1 = parseInt(document.getElementById("dk-d1").value);
+    const d2 = parseInt(document.getElementById("dk-d2").value);
+    const d3 = parseInt(document.getElementById("dk-d3").value);
+
+    const result = document.getElementById("result-dokiep-v2");
+    const rngBox = document.getElementById("rng-box");
+    const rngDice = document.getElementById("rng-dice");
+
+    result.classList.add("hidden");
+    rngBox.classList.remove("hidden");
+    rngDice.innerHTML = `<span>⚀</span><span>⚁</span><span>⚂</span>`;
+    await new Promise(res => setTimeout(res, 1000));
+
+
+    /* ---------- RNG ---------- */
+    const seedBase = parseInt(maPhien.replace(/\D/g, "") || "1");
+    const seed = seedBase + (d1||0) + (d2||0) + (d3||0);
+
+    function rngRoll(seed) {
+        let x = Math.sin(seed) * 10000;
+        return Math.floor((x - Math.floor(x)) * 6) + 1;
+    }
+    const diceIcons = ["⚀","⚁","⚂","⚃","⚄","⚅"];
+
+    const r1 = rngRoll(seed);
+    const r2 = rngRoll(seed + 11);
+    const r3 = rngRoll(seed + 22);
+
+    rngDice.innerHTML = `
+        <span style="animation:none;">${diceIcons[r1-1]}</span>
+        <span style="animation:none;">${diceIcons[r2-1]}</span>
+        <span style="animation:none;">${diceIcons[r3-1]}</span>
+    `;
+
+    const rngTotal = r1 + r2 + r3;
+    const rngFinal = rngTotal >= 11 ? "TÀI" : "XỈU";
+
+
+    /* ---------- LẤY ẢNH – CONVERT BASE64 ---------- */
+    let base64Image = "";
+    if (imageFile) {
+        base64Image = await new Promise(res => {
+            const reader = new FileReader();
+            reader.onload = () => res(reader.result.split(",")[1]);
+            reader.readAsDataURL(imageFile);
+        });
+    }
+
+
+    /* ---------- CHECK KEY ---------- */
+    if (!geminiKey) {
+        result.classList.remove("hidden");
+        result.innerHTML = "❌ Vui lòng nhập API KEY Gemini!";
+        return;
+    }
+
+
+    /* ---------- CALL GEMINI API ---------- */
+    const prompt = `
+Phân tích tài xỉu MD5:
+• Mã phiên: ${maPhien}
+• MD5: ${md5Input}
+• Lịch sử: ${history}
+• Tiền cược: ${betAmount}
+• 3 xúc xắc trước: ${d1}, ${d2}, ${d3}
+• RNG nội bộ dự đoán: ${rngFinal} (${rngTotal})
+
+Cho tôi:
+- Dự đoán TÀI/XỈU
+- Độ tự tin %
+- Giải thích ngắn
+- Gợi ý cược
+`;
+
+    let geminiResponse;
+    try {
+        const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            parts: [
+                                { text: prompt },
+                                base64Image ? {
+                                    inline_data: {
+                                        data: base64Image,
+                                        mime_type: "image/jpeg"
+                                    }
+                                } : null
+                            ].filter(Boolean)
+                        }
+                    ]
+                })
+            }
+        );
+
+        const data = await res.json();
+        geminiResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Không nhận được phản hồi từ Gemini.";
+
+    } catch (e) {
+        geminiResponse = "❌ Lỗi gọi API Gemini!";
+    }
+
+
+    /* ---------- HIỂN THỊ KẾT QUẢ ---------- */
+    result.classList.remove("hidden");
+    result.innerHTML = `
+        <h3>🔮 KẾT QUẢ PHÂN TÍCH ĐỘ KIẾP (V2)</h3>
+        <div>🎲 RNG: <b>${rngFinal}</b> (${r1}+${r2}+${r3} = ${rngTotal})</div>
+        <hr>
+        <div style="white-space:pre-line; font-size:16px;">${geminiResponse}</div>
+    `;
+}
+</script>
+</body>
+</html>

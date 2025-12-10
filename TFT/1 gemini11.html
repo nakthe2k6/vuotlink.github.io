@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dịch phụ đề SRT (Gemini API)</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 40px; background: #f9fafb; color: #111; }
+h2 { color: #2563eb; }
+label { display:block; margin-top:18px; }
+input, select, button { font-size:1rem; padding:8px; margin-top:6px; width:100%; max-width:600px; }
+button { background:#2563eb; color:white; border:none; border-radius:4px; cursor:pointer; }
+button:hover { background:#1d4ed8; }
+.progress-bar{width:100%;max-width:600px;height:18px;background:#e5e7eb;border-radius:10px;overflow:hidden;margin-top:10px;}
+.progress-bar-inner{height:100%;width:0%;background:linear-gradient(90deg,#2563eb,#60a5fa);transition:width 0.3s;}
+#status{margin-top:20px;font-weight:bold;}
+#result{white-space:pre-wrap;background:#fff;padding:10px;border:1px solid #ddd;border-radius:6px;margin-top:20px;}
+</style>
+</head>
+<body>
+
+<h2>🎬 Dịch phụ đề SRT bằng Gemini API</h2>
+
+<label>🔑 API Key
+  <input type="text" id="apiKey" placeholder="Dán API key tại đây">
+</label>
+
+<label>🌐 Ngôn ngữ đích
+  <select id="lang">
+    <option value="vi">Tiếng Việt (vi)</option>
+          <option value="en">English (en)</option>
+          <option value="ja">日本語 (ja)</option>
+          <option value="ko">한국어 (ko)</option>
+          <option value="zh">中文 (zh)</option>
+          <option value="fr">Français (fr)</option>
+          <option value="es">Español (es)</option>
+  </select>
+</label>
+
+<label>💫 Phong cách dịch
+  <select id="style">
+    <option value="default">🪶 Mặc định – dịch chuẩn từng câu, từng chữ</option>
+    <option value="tu tiên">Tu tiên</option>
+    <option value="kiếm hiệp">Kiếm hiệp</option>
+    <option value="xuyên không">Xuyên không</option>
+    <option value="hệ thống">Hệ thống</option>
+    <option value="ngôn tình hiện đại">Ngôn tình hiện đại</option>
+    <option value="cổ trang">Cổ trang</option>
+  </select>
+</label>
+
+<label>📄 File phụ đề (.srt)
+  <input type="file" id="fileInput" accept=".srt">
+</label>
+
+<button id="translateBtn">Dịch ngay</button>
+<div class="progress-bar"><div id="progressInner" class="progress-bar-inner"></div></div>
+
+<div id="status"></div>
+<div id="result"></div>
+
+<script>
+function parseSRT(t){
+  t=t.replace(/\r\n/g,"\n").trim();
+  const b=t.split(/\n\s*\n/),out=[];
+  for(const blk of b){
+    const lines=blk.split("\n");
+    if(lines.length>=3){
+      out.push({seq:lines[0],time:lines[1].trim(),text:lines.slice(2).join("\n")});
+    }
+  }
+  return out;
+}
+function formatSRT(items){return items.map(i=>`${i.seq}\n${i.time}\n${i.text}`).join("\n\n");}
+function updateProgress(p){document.getElementById("progressInner").style.width=p+"%";}
+
+function buildPrompt(style, targetLang, lines){
+  const stylePrompts = {
+    "default": `
+Hãy dịch tất cả đoạn srt dưới đây từ tiếng Trung sang tiếng Việt chuẩn nhất cho tôi 
+và tạo thành phụ đề srt và phải đúng mốc thời gian của tôi gửi, 
+dịch sát nghĩa từng câu, từng chữ, giữ nguyên phong cách kể chuyện, cảm xúc, lời thoại tự nhiên như bản gốc. 
+Không lược bớt chi tiết, không tóm tắt, phân chia ngôi các thứ nhân vật phải rõ ràng.`,
+    "tu tiên": `
+Bạn là dịch giả phim **tu tiên cổ đại**. 
+Dịch sang ${targetLang} chuẩn xác từng chữ, giữ nguyên cảm xúc, lời thoại tự nhiên.
+Dùng các đại từ cổ như: sư phụ, sư huynh, sư đệ, đạo hữu, tiên tử, chân nhân, linh khí, phi thăng...
+Ngôn ngữ trang trọng, phong cách tu tiên Hán-Việt, mang sắc thái huyền ảo và đạo lý.`,
+    "kiếm hiệp": `
+Bạn là dịch giả phim **võ hiệp cổ trang**.
+Dịch sang ${targetLang} sát nghĩa, lời thoại tự nhiên, cảm xúc rõ ràng.
+Dùng các xưng hô: các hạ, tại hạ, tiền bối, huynh đài, cô nương, giang hồ, võ công...
+Giữ tinh thần hiệp nghĩa, hành hiệp trượng nghĩa, khí phách anh hùng.`,
+    "xuyên không": `
+Bạn là dịch giả phim **xuyên không huyền huyễn**.
+Dịch sang ${targetLang}, giữ phong cách sinh động, hiện đại pha cổ đại.
+Dùng ngôn ngữ tự nhiên, phản ánh sự khác biệt thời đại giữa nhân vật xuyên không và thế giới cổ.`,
+    "hệ thống": `
+Bạn là dịch giả phim **hệ thống – nhiệm vụ – tu luyện**.
+Dịch sang ${targetLang}, dùng ngôn ngữ tự nhiên, mang phong cách game/tiên hiệp.
+Sử dụng các thuật ngữ như: hệ thống, nhiệm vụ, điểm kinh nghiệm, tăng cấp, vật phẩm, thế giới song song.`,
+    "ngôn tình hiện đại": `
+Bạn là dịch giả phim **ngôn tình hiện đại**.
+Dịch sang ${targetLang}, lời thoại mềm mại, tự nhiên, mang cảm xúc.
+Dùng cách xưng hô: anh, em, cô ấy, cậu ấy, giọng nói nhẹ nhàng, gần gũi.`,
+    "cổ trang": `
+Bạn là dịch giả phim **cổ trang Trung Hoa**.
+Dịch sang ${targetLang} chuẩn xác, dùng ngôn ngữ Hán-Việt trang trọng.
+Dùng đại từ: bản vương, thần, nô tài, hoàng thượng, ngươi, người, thần thiếp...
+Giữ nguyên phong vị cổ phong trang nghiêm, cảm xúc rõ ràng.`
+  };
+
+  const baseGuide = `
+Yêu cầu dịch:
+- Dịch **chỉ phần nội dung thoại** từ tiếng Trung sang ${targetLang}.
+- Tuyệt đối **không viết lại số thứ tự hoặc mốc thời gian** — chỉ trả về phần lời thoại dịch.
+- Không thêm mô tả như “Dưới đây là bản dịch…” hay “giữ nguyên định dạng...”.
+- Mỗi đoạn dịch tương ứng một đoạn thoại, giữ nguyên thứ tự.
+- Dịch sát nghĩa từng câu, từng chữ, thể hiện đúng cảm xúc và phong cách nhân vật.
+- Không lược bỏ, không tóm tắt, không thay đổi ngữ khí.
+- Các đoạn thoại được ngăn cách bằng <<<LINE>>>.
+- Trả về kết quả **chỉ gồm phần văn bản dịch**, theo đúng thứ tự, không thêm dòng trống hay tiêu đề.
+`;
+
+  return `${stylePrompts[style]}\n${baseGuide}\nDưới đây là nội dung cần dịch:\n${lines.join('\n<<<LINE>>>\n')}`;
+}
+
+async function translateBatch(apiKey, batch, lang, style){
+  const prompt = buildPrompt(style, lang, batch);
+  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","X-Goog-Api-Key":apiKey},
+    body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+  });
+  if(!res.ok)throw new Error(await res.text());
+  const data=await res.json();
+  const txt=data?.candidates?.[0]?.content?.parts?.[0]?.text||"";
+  return txt.split("<<<LINE>>>").map(t=>t.trim());
+}
+
+async function copyToClipboardAndSelect(text){
+  const resultBox = document.getElementById("result");
+  resultBox.focus();
+
+  // Tạo selection range để "select all"
+  const range = document.createRange();
+  range.selectNodeContents(resultBox);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+
+  try {
+    await navigator.clipboard.writeText(text);
+    const status=document.getElementById("status");
+    status.textContent+=" 📋 (Đã sao chép & chọn toàn bộ bản dịch)";
+  } catch(err) {
+    console.warn("Không thể sao chép clipboard:", err);
+  }
+}
+
+document.getElementById("translateBtn").addEventListener("click",async()=>{
+  const apiKey=document.getElementById("apiKey").value.trim();
+  const style=document.getElementById("style").value;
+  const lang=document.getElementById("lang").value;
+  const file=document.getElementById("fileInput").files[0];
+  const status=document.getElementById("status");
+  const result=document.getElementById("result");
+  if(!apiKey)return alert("Vui lòng nhập API Key");
+  if(!file)return alert("Chưa chọn file .srt");
+  status.textContent="📖 Đang đọc file...";
+  updateProgress(0);
+  const text=await file.text();
+  const subs=parseSRT(text);
+  const total=subs.length,batchSize=50;
+  let done=0;const translated=[];
+  status.textContent=`🚀 Bắt đầu dịch ${total} đoạn theo phong cách '${style}'...`;
+  try{
+    for(let i=0;i<total;i+=batchSize){
+      const batch=subs.slice(i,i+batchSize).map(s=>s.text);
+      const lines=await translateBatch(apiKey,batch,lang,style);
+      translated.push(...lines);
+      done=Math.min(total,i+batchSize);
+      const pct=Math.round((done/total)*100);
+      updateProgress(pct);
+      status.textContent=`⚙️ Đang dịch... ${done}/${total} (${pct}%)`;
+    }
+    for(let i=0;i<subs.length;i++)subs[i].text=translated[i]||subs[i].text;
+    const newSrt=formatSRT(subs);
+    updateProgress(100);
+    const blob=new Blob([newSrt],{type:"text/plain;charset=utf-8"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=url;a.download=`translated_${style}.srt`;a.click();
+    URL.revokeObjectURL(url);
+    result.textContent=newSrt.slice(0,1500)+(newSrt.length>1500?"\n...\n(đã rút gọn hiển thị)":"");
+    status.textContent="🎉 Hoàn tất! File đã tải về.";
+    await copyToClipboardAndSelect(newSrt);
+  }catch(e){
+    status.textContent="❌ Lỗi: "+e.message;updateProgress(0);
+  }
+});
+</script>
+</body>
+</html>
