@@ -1,0 +1,867 @@
+<html>
+<head>
+    <meta name="viewport" content="width=320, initial-scale=1">
+    <meta charset="utf-8">
+    <title>Tip Tip </title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.7/lib/theme-chalk/index.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/element-ui@2.15.7/lib/index.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script>
+        setButtonImage("https://tiptipios.github.io/ios/IMG_6318.png");
+        setWindowDrag(0, 0, 360, 320);
+        setWindowRect(50, 10, 300, 415);
+    </script>
+    <style>
+        html {    
+            zoom: 0.9;
+            /*在手机上显示整体放大1.2倍*/
+        }
+        #title-img {
+            position: relative;
+            z-index: 1000;
+            top: 1px;
+
+        }
+        body,
+        html {
+            min-width: 100%;
+            min-height: 100%;
+            margin: 0;
+            padding: 0;
+            font-weight: 1000;
+            font-size: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 2000;
+
+        }
+
+        *:not(input, checkbox, textarea) {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #H5AlertView {
+            text-align: center;
+        }
+
+        #titleBar {
+            font-weight: 500;
+            font-size: 14px;
+            position: relative;
+            color: white;
+            top: -7px;
+            border-radius: 5px;
+        }
+
+
+        .ciamenu1 {
+            width: 260px;
+            height: 30px;
+            border-radius: 15px;
+            background: #fff;
+            position: relative;
+            left: 15px;
+
+
+        }
+
+        .ciamain {
+            width: 250px;
+            height: 80px;
+            border-radius: 12px;
+            background: #fff;
+            position: relative;
+            left: 15px;
+            top: 0px;
+        }
+        .ayimgui {
+            position: flex;
+            width: 360px;
+            height: 320px;
+            border: 5px;
+            z-index: 999;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            border: 1px solid #555;
+            overflow: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .ayimgui .aytitle {
+            padding: 5px;
+            font-size: 15px;
+            background-color: #000;
+
+        }
+
+        .ayimgui .aytitle i {
+            font-size: 20px;
+            color: #f0f0f0;
+        }
+
+        .ayimgui .aytitle .titleClose {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: #F0F0F0;
+        }
+
+        .ayimgui .aytitle .titleClose:hover {
+            color: #409EFF;
+        }
+
+        .ayimgui .aybody {
+            padding: 15px;
+            height: calc(100% - 21px - 15px - 15px);
+            /*减去标题高度，减去上线padding高度*/
+            overflow: auto;
+            font-size: 14px;
+        }
+
+
+        .aytext {
+            width: 100%;
+            padding-top: 5px;
+            margin-bottom: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            color: rgb(51, 205, 232);
+        }
+        button:active {
+            transform: translateY(3px)
+        }
+
+        .el-checkbox {
+            margin: 0px;
+        }
+
+        .el-checkbox__label {
+            color: #f0f0f0;
+        }
+
+        .el-checkbox__input.is-checked+.el-checkbox__label {
+            color: #409EFF;
+        }
+
+        .el-checkbox__inner {
+            background-color: #333333;
+            border-radius: 50%;
+            width: 24px;
+            /* Tăng kích thước */
+            height: 24px;
+            /* Tăng kích thước */
+        }
+
+
+        .el-radio {
+            margin: 8px 0;
+        }
+
+        .el-radio__label {
+            color: #F0F0F0;
+        }
+
+        .el-radio__input.is-checked+.el-radio__label {
+            color: #f0f0f0;
+        }
+
+        .el-radio__inner {
+            background-color: rgb(254, 254, 254);
+            border: none;
+        }
+
+        .el-radio__input.is-checked .el-radio__inner {
+            background-color: rgb(254, 254, 254);
+        }
+
+        .el-radio__inner::after {
+            width: 10px;
+            height: 10px;
+            background-color: rgb(58, 138, 247);
+        }
+
+        .onlySelect {
+            background-color: rgb(254, 254, 254);
+            border: none;
+        }
+
+        .onlySelect .el-select-dropdown__item {
+            color: #F0F0F0;
+
+        }
+
+        .onlySelect .el-select-dropdown__item.hover,
+        .el-select-dropdown__item:hover:hover {
+            background-color: transparent;
+        }
+
+        .onlySelect .popper__arrow {
+            border-bottom-color: rgb(254, 254, 254) !important;
+        }
+
+        .onlySelect.el-popper[x-placement^=bottom] .popper__arrow::after {
+            border-bottom-color: rgb(8254, 254, 254) !important;
+        }
+
+        .el-select {
+            width: 100%;
+        }
+
+        .el-select .el-input {
+            background-color: rgb(254, 254, 254);
+        }
+
+        .el-select .el-input__suffix {
+            background-color: rgb(160, 196, 243);
+            color: #F0F0F0;
+            right: 0;
+        }
+
+        .el-select .el-select__caret {
+            color: #F0F0F0;
+        }
+
+        .el-select .el-input__inner {
+            background-color: transparent;
+            border: none;
+            color: #F0F0F0;
+        }
+
+        .el-select .el-input .el-select__caret {
+            color: #F0F0F0;
+        }
+
+        /* 解决ios下拉需要点两次 */
+        .el-scrollbar .el-scrollbar__bar {
+            opacity: 1 !important;
+        }
+
+        .el-button {
+            font-size: 14px;
+            padding: 5px 10px;
+            line-height: 14px;
+            color: #F0F0F0;
+            background-color: #B8D1F2;
+        }
+
+        .el-button:hover {
+            opacity: .7;
+            color: #F0F0F0;
+            background-color: #B8D1F2;
+        }
+
+        .el-button:focus,
+        .el-button:hover {
+            color: #F0F0F0;
+            background-color: #B8D1F2;
+        }
+
+        .aycollapse {
+            width: 100%;
+            height: 6%;
+            font-size: 14px;
+            background-color: rgb(0,0,0);
+            color: #e9f912;
+        }
+
+        .aytab {
+            width: 100%;
+            height: 25px;
+            display: flex;
+            border-bottom: 0.8px solid #666;
+            order: 1;
+        }
+
+        .aytab span {
+
+            padding: 0 5px;
+            width: 15%;
+            height: 97%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgb(189, 199, 208);
+            color: #F0F0F0;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 10px;
+            border-top: 0.8px solid #666;
+            border-right: 0.8px solid #666;
+            border-left: 0.8px solid #666;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            order: 2;
+        }
+
+        .aycollapses span {
+            background-color: rgb(177, 206, 240);
+            color: #000;
+        }
+
+        .el-input input {
+            background-color: rgb(254, 254, 254);
+            border: none;
+            border-radius: 0px;
+        }
+
+        .checkbox-wrapper-24 .checkbox {
+            display: table-cell;
+            width: 100%;
+            height: 100%;
+            vertical-align: middle;
+            text-align: center;
+
+        }
+
+        .checkbox-wrapper-24 label {
+            display: inline-block;
+            color: #f9f9f9;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .checkbox-wrapper-24 label span {
+            display: inline-block;
+            position: relative;
+            background-color: #999;
+            width: 25px;
+            height: 25px;
+            transform-origin: center;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 10px;
+
+        }
+
+        .checkbox-wrapper-24 label span:before {
+            content: "";
+            width: 0px;
+            height: 2px;
+            border-radius: 2px;
+            position: absolute;
+            transform: rotate(45deg);
+            top: 10px;
+            left: 4px;
+            transition: width 50ms ease 50ms;
+            transform-origin: 0% 100%;
+        }
+
+        .checkbox-wrapper-24 label span:after {
+            content: "";
+            width: 0;
+            height: 2px;
+            border-radius: 2px;
+
+            position: absolute;
+            transform: rotate(305deg);
+            top: 15px;
+            left: 8px;
+
+            transform-origin: 25% 0%;
+        }
+
+        .checkbox-wrapper-24 label:hover span:before {
+            width: 7px;
+
+        }
+
+        .checkbox-wrapper-24 label:hover span:after {
+            width: 15px;
+
+        }
+
+        .checkbox-wrapper-24 input[type=checkbox] {
+            display: none;
+
+        }
+
+        .checkbox-wrapper-24 input[type=checkbox]:checked+label span {
+            background-color: #cdcccb;
+        }
+
+        .checkbox-wrapper-24 input[type=checkbox]:checked+label span:after {
+            width: 16px;
+            background: #0cea1f;
+
+        }
+
+        .checkbox-wrapper-24 input[type=checkbox]:checked+label span:before {
+            width: 9px;
+            background: #1df40e;
+
+        }
+        .checkbox-wrapper-25 .checkbox {
+            display: table-cell;
+            width: 100%;
+            height: 100%;
+            vertical-align: middle;
+            text-align: center;
+
+        }
+
+        .checkbox-wrapper-25 label {
+            width: 102px;
+            display: inline-block;
+            color: #f9f9f9;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .checkbox-wrapper-25 label span {
+            display: inline-block;
+            position: relative;
+            background-color: #999;
+            width: 25px;
+            height: 25px;
+            transform-origin: center;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 10px;
+
+        }
+
+        .checkbox-wrapper-25 label span:before {
+            content: "";
+            width: 0px;
+            height: 2px;
+            border-radius: 2px;
+
+            position: absolute;
+            transform: rotate(45deg);
+            top: 10px;
+            left: 4px;
+            transition: width 50ms ease 50ms;
+            transform-origin: 0% 100%;
+        }
+
+        .checkbox-wrapper-25 label span:after {
+            content: "";
+            width: 0;
+            height: 2px;
+            border-radius: 2px;
+
+            position: absolute;
+            transform: rotate(305deg);
+            top: 15px;
+            left: 8px;
+
+            transform-origin: 25% 0%;
+        }
+
+        .checkbox-wrapper-25 label:hover span:before {
+            width: 7px;
+
+        }
+
+        .checkbox-wrapper-25 label:hover span:after {
+            width: 15px;
+
+        }
+
+        .checkbox-wrapper-25 input[type=checkbox] {
+            display: none;
+
+        }
+
+        .checkbox-wrapper-25 input[type=checkbox]:checked+label span {
+            background-color: #cdcccb;
+        }
+
+        .checkbox-wrapper-25 input[type=checkbox]:checked+label span:after {
+            width: 16px;
+            background: #0cea1f;
+
+        }
+
+        .checkbox-wrapper-25 input[type=checkbox]:checked+label span:before {
+            width: 9px;
+            background: #1df40e;
+
+        }
+
+        .vip {
+            background-color: rgb(243, 210, 23);
+            color: black;
+            padding: 3px 20px;
+            position: absolute;
+            bottom: 25px;
+            right: 0;
+            transform: rotate(-45deg) translate(15px, 15px);;
+            transform-origin: right bottom;
+        }
+
+        .c {
+            color: gold;
+        }
+    </style></head>
+<body>
+    <div id="app">
+        <div :class="!ifshow?'onlyTitle ayimgui':'ayimgui'" ref="menuMain">
+            <div class="aytitle" id="title-img">
+                <img style="width: 30px;height: 30px; border-radius: 50%;" src="https://tiptipios.github.io/ios/IMG_6318.png" width="40" height="40">
+                <span class="title-age" style="margin-left:20px; color:#f0f0f0;"> Menu Free  Tip Tip   <img src="https://github.com/WeansHHN/weanshhn.github.io/blob/main/img/gif/gifwaifu.gif?raw=true" alt="weanshhn" width="25" height="25" /> </span>
+            </div>
+           
+     
+                <div class="aybody">
+                    <div class="aytab">
+                        <span @click="changeTab('one')"
+                            :style="{background:tabValue==='one'?'#444444':'	#111111'}">Múp  </span>
+                                                    <span @click="changeTab('two')"
+                            :style="{background:tabValue==='two'?'#444444':'	#111111'}">ModHĐ</span>
+                        <span @click="changeTab('five')"
+                            :style="{background:tabValue==='five'?'#444444':'	#111111'}"> TipTip </span>
+                    </div>
+                   <strong>
+                        <div v-show="tabValue==='one'">
+                            <div class="aytext">
+                            </div>
+                            <div class="checkbox-wrapper-24">
+                                <div>
+                                                                           <input type="checkbox" id="lever23t" name="check" onclick="hsCu()">
+                                    <label for="lever23t" class="checkboxed"><span></span> HS Cu </label>
+                                    <input type="checkbox" id="lever23" name="check" onclick="Aim180()">
+                        <label for="lever23" class="checkboxed"><span></span> Aim 180 </label>
+                        <input type="checkbox" id="lever2e3" name="check" onclick="Nhetam()">
+                        <label for="lever2e3" class="checkboxed"><span></span> Nhẹ Tâm ( kèm Aim 180)</label>
+                        <input type="checkbox" id="lever2345t" name="check" onclick="Norecoil()">
+                        <label for="lever2345t" class="checkboxed"><span></span> Norecoil </label>
+                        <input type="checkbox" id="lever2r3" name="check" onclick="AimCope()">
+                                    <label for="lever2r3" class="checkboxed"><span></span> Aim Cope </label>
+                                    <input type="checkbox" id="lever2rt3" name="check" onclick="Xoahaot()">
+                                    <label for="lever2rt3" class="checkboxed"><span></span> Xóa Hoạt ảnh  </label>
+                                <input type="checkbox" id="lever2rt34" name="check" onclick="khunglong()">
+                                    <label for="lever2rt34" class="checkboxed"><span></span> Khủng Long   </label>
+                                            <input type="checkbox" id="lever12rt34" name="check" onclick="daochich()">
+                                    <label for="lever12rt34" class="checkboxed"><span></span> Đạo Chích   </label>
+                                                                                <input type="checkbox" id="lever989" name="check" onclick="htmua2()">
+                                    <label for="lever989" class="checkboxed"><span></span> HT Mùa 2</label>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="aytext" style="text-align: center;">
+                                <p>
+                                    hs cu, xoá hoạt ảnh bật ở sảnh 
+                                                                    </p>
+                                <p>
+                                    Make by TikTok: TipTip
+                                </p>
+                            </div>
+                        </div>
+
+
+
+                    
+<div v-show="tabValue === 'two'">
+    <div class="checkbox-wrapper-24">
+        <br>
+        <div class="aytext" style="text-align: center;"></div>
+
+        <!-- Mod HĐ Cuời Section -->
+                                <div class="aycollapse"  @click="showOption1 = !showOption1" style="cursor:pointer">
+                                    <i :class="showOption1?'el-icon-caret-bottom':'el-icon-caret-right'"></i>
+            <span> Mod HĐ Vỗ tay ( Rank vàng TC ) </span>
+        </div>
+        <el-collapse-transition>
+            <div v-show="showOption1">
+                                        <br>
+   <input type="checkbox" id="lever" name="check" onclick="lever()">
+    <label for="lever" class="checkboxed"><span></span> Lever 100 </label>
+
+    <input type="checkbox" id="hopthelv" name="check" onclick="hopthelv()">
+    <label for="hopthelv" class="checkboxed"><span></span> Tung cánh </label>
+
+    <input type="checkbox" id="ngoi" name="check" onclick="ngoi()">
+    <label for="ngoi" class="checkboxed"><span></span> Ngồi </label>
+ <input type="checkbox" id="farafal" name="check" onclick="farafal()">
+    <label for="farafal" class="checkboxed"><span></span> FARAFAl </label>
+    <input type="checkbox" id="xm8lv7" name="check" onclick="xm8lv7()">
+    <label for="xm8lv7" class="checkboxed"><span></span> XM8 </label>
+
+    <input type="checkbox" id="upmlv7" name="check" onclick="upmlv7()">
+    <label for="upmlv7" class="checkboxed"><span></span> UMP </label>
+
+    <input type="checkbox" id="camcolv7" name="check" onclick="camcolv7()">
+    <label for="camcolv7" class="checkboxed"><span></span> Cắm cờ</label>
+
+    <input type="checkbox" id="aklv7" name="check" onclick="aklv7()">
+    <label for="aklv7" class="checkboxed"><span></span> AK </label>
+
+    <input type="checkbox" id="scarlv7" name="check" onclick="scarlv7()">
+    <label for="scarlv7" class="checkboxed"><span></span> SCAR</label>
+
+    <input type="checkbox" id="mp40mxlv7" name="check" onclick="mp40mxlv7()">
+    <label for="mp40mxlv7" class="checkboxed"><span></span> MP40 </label>
+
+    <input type="checkbox" id="m1014ltlv7" name="check" onclick="m1014ltlv7()">
+    <label for="m1014ltlv7" class="checkboxed"><span></span> M1014 Long Tộc</label>
+
+    <input type="checkbox" id="famalv7" name="check" onclick="famalv7()">
+    <label for="famalv7" class="checkboxed"><span></span> Famat </label>
+
+    <input type="checkbox" id="mp40smlv7" name="check" onclick="mp40smlv7()">
+    <label for="mp40smlv7" class="checkboxed"><span></span> MP40 Sắc màu</label>
+
+    <input type="checkbox" id="mp5lv7" name="check" onclick="mp5lv7()">
+    <label for="mp5lv7" class="checkboxed"><span></span> MP5</label>
+
+    <input type="checkbox" id="m1014hlv7" name="check" onclick="m1014hlv7()">
+    <label for="m1014hlv7" class="checkboxed"><span></span> M1014 Huyết </label>
+
+    <input type="checkbox" id="m1887lv7" name="check" onclick="m1887lv7()">
+    <label for="m1887lv7" class="checkboxed"><span></span> M1887</label>
+
+    <input type="checkbox" id="gokienlv7" name="check" onclick="gokienlv7()">
+    <label for="gokienlv7" class="checkboxed"><span></span> Gõ Kiến </label>
+
+    <input type="checkbox" id="thomsonlv7" name="check" onclick="thomsonlv7()">
+    <label for="thomsonlv7" class="checkboxed"><span></span> Thomson</label>
+
+    <input type="checkbox" id="gloralv7" name="check" onclick="gloralv7()">
+    <label for="gloralv7" class="checkboxed"><span></span> Glora</label>
+
+    <input type="checkbox" id="an94lv7" name="check" onclick="an94lv7()">
+    <label for="an94lv7" class="checkboxed"><span></span> AN94</label>
+
+    <input type="checkbox" id="m4a1lv7" name="check" onclick="m4a1lv7()">
+    <label for="m4a1lv7" class="checkboxed"><span></span> M4A1</label>
+
+    <input type="checkbox" id="namdamlv7" name="check" onclick="namdamlv7()">
+    <label for="namdamlv7" class="checkboxed"><span></span> Nắm đấm</label>
+
+    <input type="checkbox" id="luclv7" name="check" onclick="luclv7()">
+    <label for="luclv7" class="checkboxed"><span></span> Lục </label>
+
+    <input type="checkbox" id="katalv7" name="check" onclick="katalv7()">
+    <label for="katalv7" class="checkboxed"><span></span> TM Kết Liễu </label>
+   <input type="checkbox" id="7katalv7B1" name="check" onclick="Racingboy7()">
+    <label for="7katalv7B1" class="checkboxed"><span></span> Racing Boy </label>
+        <input type="checkbox" id="8katalv7B2" name="check" onclick="cuoiEch7()">
+    <label for="8katalv7B2" class="checkboxed"><span></span> Bắn Pháo </label>
+    <input type="checkbox" id="9katalv7B23" name="check" onclick="cuoiBC7()">
+    <label for="9katalv7B23" class="checkboxed"><span></span> Cưỡi Bồn cầu </label>
+    <input type="checkbox" id="10katalv7B24" name="check" onclick="caothust7()">
+    <label for="10katalv7B24" class="checkboxed"><span></span> Cao Thủ ST </label>
+    <input type="checkbox" id="k1atalv7B25" name="check" onclick="caothutc7()">
+    <label for="k1atalv7B25" class="checkboxed"><span></span> Cao thủ TC </label>
+                                    </div>
+                                </el-collapse-transition>
+
+                                <br>
+   <div class="aycollapse"  @click="showOption = !showOption" style="cursor:pointer">
+                                    <i :class="showOption2?'el-icon-caret-bottom':'el-icon-caret-right'"></i>
+            <span> Mod HĐ khiêu khích </span>
+        </div>
+        <el-collapse-transition>
+            <div v-show="showOption">
+   <input type="checkbox" id="leverC" name="check" onclick="leverC()">
+    <label for="leverC" class="checkboxed"><span></span> Lever 100</label>
+
+    <input type="checkbox" id="hopthelvC" name="check" onclick="hopthelvC()">
+    <label for="hopthelvC" class="checkboxed"><span></span> Tung Cánh</label>
+
+    <input type="checkbox" id="ngoiC" name="check" onclick="ngoiC()">
+    <label for="ngoiC" class="checkboxed"><span></span> Ngồi</label>
+ <input type="checkbox" id="farafalC" name="check" onclick="farafalC()">
+    <label for="farafalC" class="checkboxed"><span></span> FARAFAl </label>
+    <input type="checkbox" id="xm8lv7C" name="check" onclick="xm8lv7C()">
+    <label for="xm8lv7C" class="checkboxed"><span></span> XM8 </label>
+
+    <input type="checkbox" id="upmlv7C" name="check" onclick="upmlv7C()">
+    <label for="upmlv7C" class="checkboxed"><span></span> UMP</label>
+
+    <input type="checkbox" id="camcolv7C" name="check" onclick="camcolv7C()">
+    <label for="camcolv7C" class="checkboxed"><span></span> Cắm Cờ</label>
+
+    <input type="checkbox" id="aklv7C" name="check" onclick="aklv7C()">
+    <label for="aklv7C" class="checkboxed"><span></span> AK</label>
+
+    <input type="checkbox" id="scarlv7C" name="check" onclick="scarlv7C()">
+    <label for="scarlv7C" class="checkboxed"><span></span> SCAR</label>
+
+    <input type="checkbox" id="mp40mxlv7C" name="check" onclick="mp40mxlv7C()">
+    <label for="mp40mxlv7C" class="checkboxed"><span></span> MP40 mãng xả</label>
+
+    <input type="checkbox" id="m1014ltlv7C" name="check" onclick="m1014ltlv7C()">
+    <label for="m1014ltlv7C" class="checkboxed"><span></span> M1014 Long Tộc</label>
+
+    <input type="checkbox" id="famalv7C" name="check" onclick="famalv7C()">
+    <label for="famalv7C" class="checkboxed"><span></span> Famat</label>
+
+    <input type="checkbox" id="mp40smlv7C" name="check" onclick="mp40smlv7C()">
+    <label for="mp40smlv7C" class="checkboxed"><span></span> MP40 Tia chớp</label>
+
+    <input type="checkbox" id="mp5lv7C" name="check" onclick="mp5lv7C()">
+    <label for="mp5lv7C" class="checkboxed"><span></span> MP5 </label>
+
+    <input type="checkbox" id="m1014hlv7C" name="check" onclick="m1014hlv7C()">
+    <label for="m1014hlv7C" class="checkboxed"><span></span> M1014 Huyết Hỏa</label>
+
+    <input type="checkbox" id="m1887lv7C" name="check" onclick="m1887lv7C()">
+    <label for="m1887lv7C" class="checkboxed"><span></span> M1887</label>
+
+    <input type="checkbox" id="gokienlv7C" name="check" onclick="gokienlv7C()">
+    <label for="gokienlv7C" class="checkboxed"><span></span> Gõ kiến </label>
+
+    <input type="checkbox" id="thomsonlv7C" name="check" onclick="thomsonlv7C()">
+    <label for="thomsonlv7C" class="checkboxed"><span></span> Thomson</label>
+
+    <input type="checkbox" id="gloralv7C" name="check" onclick="gloralv7C()">
+    <label for="gloralv7C" class="checkboxed"><span></span> Glora </label>
+
+    <input type="checkbox" id="an94lv7C" name="check" onclick="an94lv7C()">
+    <label for="an94lv7C" class="checkboxed"><span></span> AN94</label>
+
+    <input type="checkbox" id="m4a1lv7C" name="check" onclick="m4a1lv7C()">
+    <label for="m4a1lv7C" class="checkboxed"><span></span> M4A1</label>
+
+    <input type="checkbox" id="namdamlv7C" name="check" onclick="namdamlv7C()">
+    <label for="namdamlv7C" class="checkboxed"><span></span> Nắm Đấm </label>
+
+    <input type="checkbox" id="luclv7C" name="check" onclick="luclv7C()">
+    <label for="luclv7C" class="checkboxed"><span></span> Lục </label>
+
+    <input type="checkbox" id="katalv7C" name="check" onclick="katalv7C()">
+    <label for="katalv7C" class="checkboxed"><span></span> TM Kết Liễu </label>
+   <input type="checkbox" id="1katalv7B1" name="check" onclick="RacingboyC()">
+    <label for="1katalv7B1" class="checkboxed"><span></span> Racing Boy </label>
+        <input type="checkbox" id="2katalv7B2" name="check" onclick="cuoiEchC()">
+    <label for="2katalv7B2" class="checkboxed"><span></span> Bắn Pháo </label>
+    <input type="checkbox" id="3katalv7B23" name="check" onclick="cuoiBCC()">
+    <label for="3katalv7B23" class="checkboxed"><span></span> Cưỡi Bồn cầu </label>
+    <input type="checkbox" id="4katalv7B24" name="check" onclick="caothustC()">
+    <label for="4katalv7B24" class="checkboxed"><span></span> Cao Thủ ST </label>
+    <input type="checkbox" id="5katalv7B25" name="check" onclick="caothutcC()">
+    <label for="5katalv7B25" class="checkboxed"><span></span> Cao thủ TC </label>
+
+                                    </div>
+                                </el-collapse-transition>
+                                <br>
+            <div class="aycollapse"  @click="showOption2 = !showOption2" style="cursor:pointer">
+                                    <i :class="showOption2?'el-icon-caret-bottom':'el-icon-caret-right'"></i>
+            <span> Mod HĐ Dab ( rank vàng St ) </span>
+        </div>
+        <el-collapse-transition>
+            <div v-show="showOption2">
+    <input type="checkbox" id="leverB" name="check" onclick="leverB()">
+    <label for="leverB" class="checkboxed"><span></span> Lever 100</label>
+
+    <input type="checkbox" id="hopthelvB" name="check" onclick="hopthelvB()">
+    <label for="hopthelvB" class="checkboxed"><span></span> tung cánh</label>
+
+    <input type="checkbox" id="ngoiB" name="check" onclick="ngoiB()">
+    <label for="ngoiB" class="checkboxed"><span></span> Ngồi</label>
+ <input type="checkbox" id="farafalB" name="check" onclick="farafalB()">
+    <label for="farafalB" class="checkboxed"><span></span> FARAFAl </label>
+    
+    <input type="checkbox" id="xm8lv7B" name="check" onclick="xm8lv7B()">
+    <label for="xm8lv7B" class="checkboxed"><span></span> XM8 </label>
+
+    <input type="checkbox" id="upmlv7B" name="check" onclick="upmlv7B()">
+    <label for="upmlv7B" class="checkboxed"><span></span> UMP </label>
+
+    <input type="checkbox" id="camcolv7B" name="check" onclick="camcolv7B()">
+    <label for="camcolv7B" class="checkboxed"><span></span> Cắm cờ</label>
+
+    <input type="checkbox" id="aklv7B" name="check" onclick="aklv7B()">
+    <label for="aklv7B" class="checkboxed"><span></span> AK </label>
+
+    <input type="checkbox" id="scarlv7B" name="check" onclick="scarlv7B()">
+    <label for="scarlv7B" class="checkboxed"><span></span> SCAR </label>
+
+    <input type="checkbox" id="mp40mxlv7B" name="check" onclick="mp40mxlv7B()">
+    <label for="mp40mxlv7B" class="checkboxed"><span></span> MP40 Mãng xà</label>
+
+    <input type="checkbox" id="m1014ltlv7B" name="check" onclick="m1014ltlv7B()">
+    <label for="m1014ltlv7B" class="checkboxed"><span></span> M1014 Long Tộc </label>
+
+    <input type="checkbox" id="famalv7B" name="check" onclick="famalv7B()">
+    <label for="famalv7B" class="checkboxed"><span></span> Famat</label>
+
+    <input type="checkbox" id="mp40smlv7B" name="check" onclick="mp40smlv7B()">
+    <label for="mp40smlv7B" class="checkboxed"><span></span> MP40 Tia chớp</label>
+
+    <input type="checkbox" id="mp5lv7B" name="check" onclick="mp5lv7B()">
+    <label for="mp5lv7B" class="checkboxed"><span></span> MP5</label>
+
+    <input type="checkbox" id="m1014hlv7B" name="check" onclick="m1014hlv7B()">
+    <label for="m1014hlv7B" class="checkboxed"><span></span> M1014 Huyết Hỏa</label>
+
+    <input type="checkbox" id="m1887lv7B" name="check" onclick="m1887lv7B()">
+    <label for="m1887lv7B" class="checkboxed"><span></span> M1887 </label>
+
+    <input type="checkbox" id="gokienlv7B" name="check" onclick="gokienlv7B()">
+    <label for="gokienlv7B" class="checkboxed"><span></span> Gõ Kiến </label>
+
+    <input type="checkbox" id="thomsonlv7B" name="check" onclick="thomsonlv7B()">
+    <label for="thomsonlv7B" class="checkboxed"><span></span> Thomson</label>
+
+    <input type="checkbox" id="gloralv7B" name="check" onclick="gloralv7B()">
+    <label for="gloralv7B" class="checkboxed"><span></span> Glora</label>
+
+    <input type="checkbox" id="an94lv7B" name="check" onclick="an94lv7B()">
+    <label for="an94lv7B" class="checkboxed"><span></span> AN94</label>
+
+    <input type="checkbox" id="m4a1lv7B" name="check" onclick="m4a1lv7B()">
+    <label for="m4a1lv7B" class="checkboxed"><span></span> M4A1</label>
+
+    <input type="checkbox" id="namdamlv7B" name="check" onclick="namdamlv7B()">
+    <label for="namdamlv7B" class="checkboxed"><span></span> Nắm Đấm </label>
+
+    <input type="checkbox" id="luclv7B" name="check" onclick="luclv7B()">
+    <label for="luclv7B" class="checkboxed"><span></span> Lục </label>
+
+    <input type="checkbox" id="katalv7B" name="check" onclick="katalv7B()">
+    <label for="katalv7B" class="checkboxed"><span></span> TM Kết Liễu </label>
+    <input type="checkbox" id="katalv7B1" name="check" onclick="RacingboyB()">
+    <label for="katalv7B1" class="checkboxed"><span></span> Racing Boy </label>
+        <input type="checkbox" id="katalv7B2" name="check" onclick="cuoiEchN()">
+    <label for="katalv7B2" class="checkboxed"><span></span> Bắn Pháo </label>
+    <input type="checkbox" id="katalv7B23" name="check" onclick="cuoiBCB()">
+    <label for="katalv7B23" class="checkboxed"><span></span> Cưỡi Bồn cầu </label>
+    <input type="checkbox" id="katalv7B24" name="check" onclick="caothustB()">
+    <label for="katalv7B24" class="checkboxed"><span></span> Cao Thủ ST </label>
+    <input type="checkbox" id="katalv7B25" name="check" onclick="caothutcB()">
+    <label for="katalv7B25" class="checkboxed"><span></span> Cao thủ TC </label>
+                                    </div>
+                                </el-collapse-transition>
+                            <br>
+        <div class="aytext" style="text-align: center;">
+            <p>Make by TikTok: TipTip</p>
+        </div>
+    </div>
+</div>
+                        <div v-show="tabValue === 'five'">
+                            <div class="checkbox-wrapper-24">
+                                <br>
+
+                                <br>
+                                <a href="https://t.me/gamemodios"><button style=" margin: 8px 25px;"> Telegram: TipTip</button></a>
+                                <br>
+                                <a href="https://t.me/freefiretiptip"><button style=" margin: 8px 25px;">Box Chat Telegram FF </button></a>
+                            </div>
+                            <br>
+                            <div class="aytext" style="text-align: center;">
+                                <p>
+                                    Make by TikTok: TipTip
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </strong>
+            </div>
+        </div>
+<script src="https://tiptipios.github.io/ios/js/123455 7.js"></script>
+</body>
+</html>
