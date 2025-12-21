@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API SEVER KEY</title>
+
+<style>
+body{
+  margin:0;
+  background:#f2f4f8;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+}
+
+.header{
+  padding:15px;
+  display:flex;
+  align-items:center;
+  font-weight:600;
+  font-size:18px;
+}
+
+.header img{
+  width:36px;
+  height:36px;
+  border-radius:8px;
+  margin-right:10px;
+}
+
+.box{
+  background:#fff;
+  margin:20px;
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 5px 15px rgba(0,0,0,.05);
+}
+
+.title{
+  font-size:22px;
+  font-weight:700;
+  text-align:center;
+}
+
+.desc{
+  margin-top:8px;
+  color:#888;
+  font-size:14px;
+  text-align:center;
+}
+
+.key-box{
+  margin-top:20px;
+  background:#f6f7fb;
+  border-radius:12px;
+  padding:15px;
+  word-break:break-all;
+  font-size:15px;
+  font-weight:600;
+}
+
+.copy-btn{
+  margin-top:16px;
+  background:linear-gradient(135deg,#6f6cff,#8a7cff);
+  color:#fff;
+  border:none;
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  font-size:16px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.copy-btn span{
+  margin-right:8px;
+}
+
+.note{
+  margin-top:10px;
+  text-align:center;
+  color:#888;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <!-- icon giả, bạn có thể thay -->
+  <img src="https://files.catbox.moe/hau53e.JPG">
+  API SEVER KEY
+</div>
+
+<div class="box">
+  <div class="title">Key Của Bạn (Key 1 Day)</div>
+  <div class="desc">
+    Vui lòng lưu lại key này, bạn sẽ không thể xem lại sau khi đóng trang
+  </div>
+
+  <div class="key-box" id="key">
+KEYFREE_DinhAnh
+  </div>
+
+  <button class="copy-btn" onclick="copyKey()">
+    <span>📋</span> SAO CHÉP KEY
+  </button>
+
+  <div class="note">
+    Bấm vào nút để sao chép key vào khay nhớ tạm (clipboard)
+  </div>
+</div>
+
+<script>
+function copyKey(){
+  let text=document.getElementById("key").innerText;
+  navigator.clipboard.writeText(text);
+  alert("✅ Đã sao chép key");
+}
+</script>
+
+</body>
+</html>
