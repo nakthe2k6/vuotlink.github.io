@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Lua Runner with Log</title>
+  <script src="https://cdn.jsdelivr.net/npm/lua.vm.js/dist/lua.vm.js"></script>
+  <script src="lua_runner.js"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    textarea { width: 100%; }
+    pre { background: #222; color: #0f0; padding: 10px;}
+  </style>
+</head>
+<body>
+  <h2>Run Lua & Log Execution</h2>
+  <button onclick="runLuaFromFile()">RUN main.lua</button>
+  <button onclick="downloadLog()">Download Log</button>
+  <h3>Output</h3>
+  <pre id="output"></pre>
+  <h3>Log</h3>
+  <pre id="log"></pre>
+</body>
+</html>
