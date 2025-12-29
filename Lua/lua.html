@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Lua Runner – Upload & Execute</title>
+
+<!-- load thư viện lua.vm.js -->
+<script defer src="https://cdn.jsdelivr.net/npm/lua.vm.js/dist/lua.vm.js" crossorigin="anonymous"></script>
+
+<style>
+  body { font-family: Arial; padding: 20px; }
+  pre { background: #222; color: #0f0; padding: 10px; white-space: pre-wrap; }
+  button { margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<h2>Chạy file Lua (Upload)</h2>
+<input type="file" id="luaFile" accept=".lua">
+<br>
+<button onclick="runLua()">Chạy Lua</button>
+<button onclick="downloadLog()">Tải log</button>
+
+<h3>Output</h3>
+<pre id="output"></pre>
+
+<h3>Log</h3>
+<pre id="log"></pre>
+
+<script>
+let logData = "";
+
+// đợi thư viện lua load xong
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof lua === "undefined") {
+    appendLog("⚠️ Lua VM chưa sẵn sàng – hãy thử refresh lại sau 1 giây");
+  }
+});
+
+function appendLog(msg) {
+  const time = new Date().toLocaleString();
+  const line = `[${time}] ${msg}`;
+  logData += line + "\n";
+  document.getElementById("log").textContent = logData;
+}
+
+function runLua() {
+  const file = document.getElementById("luaFile").files[0];
+  if (!file) return alert("Hãy chọn file .lua trước!");
+
+  if (typeof lua === "undefined") {
+    alert("⚠️ Lua VM chưa load xong, hãy đợi 1–2s và thử lại!");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const code = e.target.result;
+    appendLog("RUN FILE: " + file.name);
+
+    try {
+      const result = lua.run(code);
+      document.getElementById("output").textContent = result;
+      appendLog("RESULT: " + result);
+    } catch (err) {
+      document.getElementById("output").textContent = "❌ Lỗi Lua!";
+      appendLog("ERROR: " + err);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function downloadLog() {
+  const blob = new Blob([logData], { type: "text/plain" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "lua_log.txt";
+  a.click();
+}
+</script>
+
+</body>
+</html>
